@@ -3,6 +3,7 @@ using Infrustructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Route.Talabat.APIs.Middlewares;
 
 namespace RouteTechSummit.API
 {
@@ -54,12 +55,17 @@ namespace RouteTechSummit.API
             }
 
             #region Configure Kestrel Middelwares
+
+            app.UseMiddleware<ExceptionMiddleware>();
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
             app.UseHttpsRedirection();
 
