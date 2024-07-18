@@ -73,22 +73,5 @@ namespace RouteTechSummit.API.Controllers
             });
         }
 
-        [Authorize]
-        [HttpGet] // GET : /api/account
-        public async Task<ActionResult<UserDto>> GetCurrentUser()
-        {
-            var email = User.FindFirstValue(ClaimTypes.Email) ?? string.Empty;
-
-            var user = await _userManager.FindByEmailAsync(email);
-
-            return Ok(new UserDto()
-            {
-                DisplayName = user?.DisplayName ?? string.Empty,
-                Email = user?.Email ?? string.Empty,
-                Token = await _authService.CreateTokenAsync(user, _userManager)
-            });
-        }
-
-
     }
 }

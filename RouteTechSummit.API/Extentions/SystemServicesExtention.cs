@@ -1,4 +1,5 @@
 ﻿using Application.AuthServices;
+using Core;
 using Core.Repository.Contract;
 using Core.Services.Contract;
 using Infrustructure;
@@ -15,7 +16,9 @@ namespace RouteTechSummit.API.Extentions
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
 
-            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+             services.AddScoped(typeof(IUniteOfWork), typeof(UniteOfWork));
+
+            //services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             services.AddAutoMapper(typeof(MappingProfiles));
 
