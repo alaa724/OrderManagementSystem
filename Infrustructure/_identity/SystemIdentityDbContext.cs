@@ -1,0 +1,21 @@
+﻿using Core.Entities.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Infrustructure._identity
+{
+    public class SystemIdentityDbContext : IdentityDbContext<SystemUser>
+    {
+        public SystemIdentityDbContext(DbContextOptions options) 
+            : base(options)
+        {
+
+        }
+
+    }
+}

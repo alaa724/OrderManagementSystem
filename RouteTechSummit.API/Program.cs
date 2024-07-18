@@ -1,15 +1,18 @@
 
+using Core.Entities.Identity;
+using Infrustructure._identity;
 using Infrustructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Route.Talabat.APIs.Middlewares;
+using RouteTechSummit.API.Extentions;
 
 namespace RouteTechSummit.API
 {
     public class Program
     {
-        public static async void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var webApplicationBuilder = WebApplication.CreateBuilder(args);
 
@@ -17,13 +20,24 @@ namespace RouteTechSummit.API
             // Add services to the container.
 
             webApplicationBuilder.Services.AddControllers();
+            webApplicationBuilder.Services.AddSwaggerServices();
+            webApplicationBuilder.Services.AddApplicationServices();
             webApplicationBuilder.Services.AddEndpointsApiExplorer();
-            webApplicationBuilder.Services.AddSwaggerGen();
 
             webApplicationBuilder.Services.AddDbContext<OrderManagementDbContext>(options =>
             {
                 options.UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("DefaultConnection"));
             });
+
+            webApplicationBuilder.Services.AddDbContext<SystemIdentityDbContext>(options =>
+            {
+                options.UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("IdentityConnection"));
+            });
+
+            webApplicationBuilder.Services.AddAuthServices(webApplicationBuilder.Configuration);
+
+            webApplicationBuilder.Services.AddIdentity<SystemUser, IdentityRole>().AddEntityFrameworkStores<OrderManagementDbContext>();
+
 
             #endregion
 
@@ -35,17 +49,16 @@ namespace RouteTechSummit.API
 
             var _dbContext = services.GetRequiredService<OrderManagementDbContext>(); // Ask CLR For Creating Object From DbContext Explicity
 
+            var _IdentitydbContext = services.GetRequiredService<SystemIdentityDbContext>(); // Ask CLR For Creating Object From DbContext Explicity
+
             var loggerFactory = services.GetRequiredService<ILoggerFactory>();
 
             try
             {
                 await _dbContext.Database.MigrateAsync(); // Update-Database
 
-                //await _IdentitydbContext.Database.MigrateAsync(); // Update-Database
+                await _IdentitydbContext.Database.MigrateAsync(); // Update-Database
 
-                //var _userManager = services.GetRequiredService<UserManager<ApplicationUsers>>();
-
-                //await ApplicationIdentityDbContextSeed.SeedUserAsync(_userManager);
             }
             catch (Exception ex)
             {
@@ -61,8 +74,7 @@ namespace RouteTechSummit.API
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerMiddlewares();
             }
 
             app.UseStatusCodePagesWithReExecute("/errors/{0}");
